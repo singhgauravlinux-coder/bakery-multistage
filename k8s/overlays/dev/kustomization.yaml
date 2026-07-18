@@ -48,6 +48,9 @@ patches:
 #     - name: ghcr.io/OWNER/bakery-language/auth-service
 #       newTag: <short-sha>
 images:
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/frontend
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/frontend
+  newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/inventory-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/inventory-service
   newTag: c77858f
