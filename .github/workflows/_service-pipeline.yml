@@ -99,7 +99,7 @@ jobs:
     environment:
       name: dev
     concurrency:
-      group: bump-image-dev
+      group: bump-image-dev-${{ inputs.service }}
       cancel-in-progress: false
     permissions:
       contents: write
@@ -122,7 +122,7 @@ jobs:
     environment:
       name: uat
     concurrency:
-      group: bump-image-uat
+      group: bump-image-uat-${{ inputs.service }}
       cancel-in-progress: false
     permissions:
       contents: write
@@ -145,7 +145,7 @@ jobs:
     environment:
       name: production
     concurrency:
-      group: bump-image-production
+      group: bump-image-production-${{ inputs.service }}
       cancel-in-progress: false
     permissions:
       contents: write
