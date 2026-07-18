@@ -130,3 +130,6 @@ images:
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/supplier-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/supplier-service
   newTag: fc7b23f
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/user-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/user-service
+  newTag: c31af6b
