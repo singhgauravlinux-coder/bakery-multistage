@@ -38,6 +38,7 @@ commonLabels:
 
 
 
+
 patches:
 - path: patch-ingress-host.yaml
   target:
@@ -103,7 +104,7 @@ images:
   newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/language-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/language-service
-  newTag: fc7b23f
+  newTag: e95986e
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/loyalty-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/loyalty-service
   newTag: e95986e
