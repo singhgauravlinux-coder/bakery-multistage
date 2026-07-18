@@ -27,6 +27,11 @@ patches:
       kind: Ingress
       name: bakery-ingress
 
+  - path: patch-db-ingress-host.yaml
+    target:
+      kind: Ingress
+      name: bakery-db-ingress
+
   - patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/resources
