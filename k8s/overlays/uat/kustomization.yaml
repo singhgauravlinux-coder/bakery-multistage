@@ -17,12 +17,12 @@ commonLabels:
   environment: uat
 
 patches:
-- path: patch-ingress-host.yaml
-  target:
-    kind: Ingress
-    name: bakery-ingress
+  - path: patch-ingress-host.yaml
+    target:
+      kind: Ingress
+      name: bakery-ingress
 
-- path: patch-ingress-middleware.yaml
+  - path: patch-ingress-middleware.yaml
     target:
       kind: Ingress
       name: bakery-ingress
