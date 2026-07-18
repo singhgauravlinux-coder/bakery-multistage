@@ -22,10 +22,10 @@ kind: Ingress
 metadata:
   name: bakery-ingress
   namespace: bakery
-#  annotations:
+  annotations:
     # <namespace>-<middleware>@kubernetescrd
 #    traefik.ingress.kubernetes.io/router.middlewares: bakery-dev-limit@kubernetescrd
- #   traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   ingressClassName: traefik
   rules:
