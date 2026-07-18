@@ -11,32 +11,35 @@ kind: Kustomization
 namespace: bakery-prod
 
 resources:
-  - ../../base
-  - ../../base/ingress
+- ../../base
+- ../../base/ingress
 
 commonLabels:
   environment: production
 
 patches:
-  - path: patch-ingress-host.yaml
-    target:
-      kind: Ingress
-      name: bakery-ingress
-  - target:
-      kind: Deployment
-      labelSelector: "app.kubernetes.io/part-of=crumb-and-ember"
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/resources
-        value:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 384Mi
-      - op: replace
-        path: /spec/replicas
-        value: 2
+- path: patch-ingress-host.yaml
+  target:
+    kind: Ingress
+    name: bakery-ingress
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources
+      value:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 384Mi
+    - op: replace
+      path: /spec/replicas
+      value: 2
+  target:
+    kind: Deployment
+    labelSelector: app.kubernetes.io/part-of=crumb-and-ember
 
-images: []
+images:
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/order-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/order-service
+  newTag: c77858f
