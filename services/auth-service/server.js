@@ -57,6 +57,26 @@ function verifyToken(token) {
   } catch { return null; }
 }
 
+// Password-reset tokens are signed the same way but scoped with `purpose`
+// so a reset link can never be replayed as a login token or vice versa.
+const RESET_TOKEN_TTL_MS = Number(process.env.AUTH_RESET_TOKEN_TTL_MS || 15 * 60 * 1000);
+function signResetToken(userId) {
+  const payload = Buffer.from(JSON.stringify({ sub: userId, purpose: 'reset', exp: Date.now() + RESET_TOKEN_TTL_MS })).toString('base64url');
+  const sig = crypto.createHmac('sha256', TOKEN_SECRET).update(payload).digest('base64url');
+  return `${payload}.${sig}`;
+}
+function verifyResetToken(token) {
+  try {
+    const [payload, sig] = String(token).split('.');
+    const expected = crypto.createHmac('sha256', TOKEN_SECRET).update(payload).digest();
+    const given = Buffer.from(sig, 'base64url');
+    if (given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) return null;
+    const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
+    if (!data.sub || data.purpose !== 'reset' || Date.now() > data.exp) return null;
+    return data.sub;
+  } catch { return null; }
+}
+
 // --- Storage: PostgreSQL when DATABASE_URL is set, in-memory otherwise ---
 const pool = DATABASE_URL ? new Pool({ connectionString: DATABASE_URL, max: 10 }) : null;
 if (pool) pool.on('error', (err) => logger.error({ event: 'pg_pool_error', message: err.message }, 'postgres pool error'));
@@ -70,6 +90,11 @@ const store = pool ? {
       'SELECT email, user_id AS "userId", name, password_hash AS "passwordHash" FROM accounts WHERE email = $1', [email]);
     return rows[0] || null;
   },
+  async findById(userId) {
+    const { rows } = await pool.query(
+      'SELECT email, user_id AS "userId", name, password_hash AS "passwordHash" FROM accounts WHERE user_id = $1', [userId]);
+    return rows[0] || null;
+  },
   async create(email, name, passwordHash) {
     const { rows } = await pool.query(
       `INSERT INTO accounts (email, user_id, name, password_hash)
@@ -78,15 +103,30 @@ const store = pool ? {
        RETURNING user_id AS "userId"`, [email, name, passwordHash]);
     return rows[0] || null;
   },
+  async updatePassword(userId, passwordHash) {
+    const { rowCount } = await pool.query(
+      'UPDATE accounts SET password_hash = $1 WHERE user_id = $2', [passwordHash, userId]);
+    return rowCount > 0;
+  },
   async ping() { await pool.query('SELECT 1'); }
 } : {
   mode: 'memory',
   async find(email) { return memoryAccounts.get(email) || null; },
+  async findById(userId) {
+    for (const account of memoryAccounts.values()) if (account.userId === userId) return account;
+    return null;
+  },
   async create(email, name, passwordHash) {
     if (memoryAccounts.has(email)) return null;
     const account = { email, userId: 'u-' + (memoryAccounts.size + 1), name, passwordHash };
     memoryAccounts.set(email, account);
     return { userId: account.userId };
+  },
+  async updatePassword(userId, passwordHash) {
+    for (const account of memoryAccounts.values()) {
+      if (account.userId === userId) { account.passwordHash = passwordHash; return true; }
+    }
+    return false;
   },
   async ping() {}
 };
@@ -154,6 +194,81 @@ app.get('/auth/verify', (req, res) => {
   const userId = verifyToken(token);
   if (!userId) return res.status(401).json({ valid: false });
   res.json({ valid: true, userId });
+});
+
+// Step 1 of the forgot-password flow: issue a short-lived, purpose-scoped
+// reset token for the account, if one exists. The response never reveals
+// whether the email was registered, to avoid leaking account existence.
+// There's no real mail transport wired up in this demo (see
+// notification-service for the mock email/SMS dispatcher this would call
+// in production), so the token is logged as it would be emailed and also
+// returned directly to the caller so the UI can move straight to the
+// reset-password step.
+app.post('/auth/forgot-password', async (req, res, next) => {
+  try {
+    const { email } = req.body || {};
+    if (!email) return res.status(400).json({ error: 'email is required' });
+
+    const account = await store.find(email);
+    if (!account) {
+      req.log.info({ event: 'password_reset_requested_unknown_email' }, 'reset requested for unknown email');
+      return res.json({ message: 'If that email exists, a reset link was sent.' });
+    }
+
+    const resetToken = signResetToken(account.userId);
+    req.log.info({ event: 'password_reset_requested', userId: account.userId }, 'reset link generated (would be emailed)');
+    res.json({ message: 'If that email exists, a reset link was sent.', resetToken });
+  } catch (err) { next(err); }
+});
+
+// Step 2: redeem the reset token for a new password. No knowledge of the
+// old password is required — that's the point of "forgot" password.
+app.post('/auth/reset-password', async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body || {};
+    if (!token || !newPassword) return res.status(400).json({ error: 'token and newPassword are required' });
+    if (newPassword.length < 8) return res.status(400).json({ error: 'newPassword must be at least 8 characters' });
+
+    const userId = verifyResetToken(token);
+    if (!userId) return res.status(401).json({ error: 'Reset link is invalid or has expired' });
+
+    const updated = await store.updatePassword(userId, hashPassword(newPassword));
+    if (!updated) return res.status(404).json({ error: 'Account not found' });
+
+    req.log.info({ event: 'password_reset', userId }, 'password reset via forgot-password flow');
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
+app.post('/auth/password', async (req, res, next) => {
+  try {
+    const token = (req.headers.authorization || '').replace('Bearer ', '');
+    const userId = verifyToken(token);
+    if (!userId) return res.status(401).json({ error: 'Invalid or expired token' });
+
+    const { currentPassword, newPassword } = req.body || {};
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'currentPassword and newPassword are required' });
+    }
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'newPassword must be at least 8 characters' });
+    }
+
+    const account = await store.findById(userId);
+    if (!account || !verifyPassword(currentPassword, account.passwordHash)) {
+      req.log.warn({ event: 'password_update_failed', userId }, 'current password did not match');
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+    if (verifyPassword(newPassword, account.passwordHash)) {
+      return res.status(400).json({ error: 'New password must be different from the current password' });
+    }
+
+    const updated = await store.updatePassword(userId, hashPassword(newPassword));
+    if (!updated) return res.status(404).json({ error: 'Account not found' });
+
+    req.log.info({ event: 'password_updated', userId }, 'password updated');
+    res.json({ ok: true });
+  } catch (err) { next(err); }
 });
 
 // --- 404 + error handling ----------------------------------------------
