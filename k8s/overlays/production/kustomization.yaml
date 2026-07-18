@@ -72,7 +72,7 @@ images:
   newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/language-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/language-service
-  newTag: e95986e
+  newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/loyalty-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/loyalty-service
   newTag: c31af6b
