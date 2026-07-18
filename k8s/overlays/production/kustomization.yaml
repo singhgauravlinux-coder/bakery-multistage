@@ -90,7 +90,7 @@ images:
   newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/pricing-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/pricing-service
-  newTag: fddf672
+  newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/product-catalog-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/product-catalog-service
   newTag: c31af6b
