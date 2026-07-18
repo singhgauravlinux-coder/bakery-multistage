@@ -51,4 +51,19 @@ runs:
         fi
         git add "${{ inputs.overlay }}/kustomization.yaml"
         git commit -m "ci(${{ inputs.service }}): bump ${{ inputs.environment }} to ${{ inputs.image_tag }} [skip ci]"
-        git push origin main
+
+        # main can move between our checkout and our push (other services'
+        # bump jobs, manual commits, etc.), so retry with a rebase instead
+        # of failing outright.
+        for attempt in 1 2 3 4 5; do
+          if git push origin main; then
+            exit 0
+          fi
+          echo "Push rejected (attempt ${attempt}/5), fetching and rebasing..."
+          sleep $(( RANDOM % 5 + 1 ))
+          git fetch origin main
+          git rebase origin/main
+        done
+
+        echo "Failed to push after 5 attempts." >&2
+        exit 1
