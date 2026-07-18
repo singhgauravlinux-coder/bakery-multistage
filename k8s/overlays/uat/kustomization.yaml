@@ -71,7 +71,7 @@ patches:
 images:
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/analytics-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/analytics-service
-  newTag: fc7b23f
+  newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/api-gateway
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/api-gateway
   newTag: c31af6b
