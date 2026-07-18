@@ -119,7 +119,7 @@ images:
   newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/recipe-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/recipe-service
-  newTag: e95986e
+  newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/recommendation-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/recommendation-service
   newTag: c31af6b
