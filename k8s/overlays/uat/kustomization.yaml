@@ -59,7 +59,7 @@ images:
   newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/search-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/search-service
-  newTag: c77858f
+  newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/supplier-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/supplier-service
   newTag: fc7b23f
