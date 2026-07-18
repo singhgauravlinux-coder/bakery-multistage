@@ -426,6 +426,17 @@
     <div id="acct-recos"></div>
     <p style="font-weight:900; margin:20px 0 10px">Recent orders</p>
     <div id="order-list"></div>
+    <p style="font-weight:900; margin:20px 0 10px">Change password</p>
+    <div class="field">
+      <label for="pwd-current">Current password</label>
+      <input id="pwd-current" type="password" autocomplete="current-password" />
+    </div>
+    <div class="field">
+      <label for="pwd-new">New password</label>
+      <input id="pwd-new" type="password" autocomplete="new-password" placeholder="At least 8 characters" />
+    </div>
+    <button class="btn pink" id="pwd-submit" style="width:100%; justify-content:center">Update password</button>
+    <p class="hint" id="pwd-hint"></p>
   </div>
   <div class="foot"><button class="btn ghost" id="logout-btn" style="width:100%; justify-content:center">Sign out</button></div>
 </aside>
@@ -436,7 +447,7 @@
       <h2 class="display" style="color:var(--straw)">Hello, baker</h2>
       <button class="x" data-close aria-label="Close">✕</button>
     </div>
-    <div class="tabs">
+    <div class="tabs" id="auth-tabs">
       <button id="tab-login" class="active">Sign in</button>
       <button id="tab-register">Register</button>
     </div>
@@ -444,15 +455,30 @@
       <label for="reg-name">Name</label>
       <input id="reg-name" autocomplete="name" />
     </div>
-    <div class="field">
-      <label for="auth-email">Email</label>
-      <input id="auth-email" type="email" autocomplete="email" placeholder="amelie@crumbandember.dev" />
+    <div id="pane-credentials">
+      <div class="field">
+        <label for="auth-email">Email</label>
+        <input id="auth-email" type="email" autocomplete="email" placeholder="amelie@crumbandember.dev" />
+      </div>
+      <div class="field">
+        <label for="auth-pass">Password</label>
+        <input id="auth-pass" type="password" autocomplete="current-password" placeholder="demo: baguette" />
+      </div>
+      <p class="hint" id="forgot-link" style="text-align:right; margin-top:-6px"><a href="#" id="forgot-btn">Forgot password?</a></p>
     </div>
-    <div class="field">
-      <label for="auth-pass">Password</label>
-      <input id="auth-pass" type="password" autocomplete="current-password" placeholder="demo: baguette" />
+    <div class="field" id="pane-forgot" style="display:none">
+      <label for="forgot-email">Email</label>
+      <input id="forgot-email" type="email" autocomplete="email" placeholder="amelie@crumbandember.dev" />
+    </div>
+    <div id="pane-reset" style="display:none">
+      <p class="hint ok" style="margin-bottom:10px">Reset link generated — enter a new password below.</p>
+      <div class="field">
+        <label for="reset-new-pass">New password</label>
+        <input id="reset-new-pass" type="password" autocomplete="new-password" placeholder="At least 8 characters" />
+      </div>
     </div>
     <button class="btn pink" id="auth-submit" style="width:100%; justify-content:center">Sign in</button>
+    <p class="hint" id="back-link" style="display:none; text-align:center; margin-top:10px"><a href="#" id="back-btn">‹ Back to sign in</a></p>
     <p class="hint" id="auth-hint"></p>
   </div>
 </div>
@@ -802,6 +828,16 @@
       body: body === undefined ? undefined : JSON.stringify(body)
     }).then(function (r) { return r.json().then(function (b) { if (!r.ok) throw b; return b; }); });
   }
+  function sendAuthJSON(method, path, body) {
+    return fetch(API + path, {
+      method: method,
+      headers: {
+        'content-type': 'application/json', accept: 'application/json',
+        authorization: 'Bearer ' + (session && session.token)
+      },
+      body: body === undefined ? undefined : JSON.stringify(body)
+    }).then(function (r) { return r.json().then(function (b) { if (!r.ok) throw b; return b; }); });
+  }
   function toast(msg) {
     var t = document.getElementById('toast');
     t.textContent = msg;
@@ -848,30 +884,79 @@
     accountBtn.textContent = session ? ('👤 ' + (session.name || session.userId)) : 'Sign in';
   }
   accountBtn.addEventListener('click', function () {
-    if (!session) { openPanel('auth-modal'); return; }
+    if (!session) { setAuthMode('login'); openPanel('auth-modal'); return; }
     openAccount();
   });
   document.getElementById('loyalty-cta').addEventListener('click', function () {
-    if (session) { openAccount(); } else { openPanel('auth-modal'); }
+    if (session) { openAccount(); } else { setAuthMode('login'); openPanel('auth-modal'); }
   });
+
+  var resetToken = null; // holds the token returned by /auth/forgot-password until reset is submitted
 
   document.getElementById('tab-login').addEventListener('click', function () { setAuthMode('login'); });
   document.getElementById('tab-register').addEventListener('click', function () { setAuthMode('register'); });
+  document.getElementById('forgot-btn').addEventListener('click', function (e) {
+    e.preventDefault();
+    document.getElementById('forgot-email').value = document.getElementById('auth-email').value.trim();
+    setAuthMode('forgot');
+  });
+  document.getElementById('back-btn').addEventListener('click', function (e) { e.preventDefault(); setAuthMode('login'); });
+
   function setAuthMode(mode) {
     authMode = mode;
+    resetToken = null;
+    document.getElementById('auth-tabs').style.display = (mode === 'forgot' || mode === 'reset') ? 'none' : 'flex';
     document.getElementById('tab-login').classList.toggle('active', mode === 'login');
     document.getElementById('tab-register').classList.toggle('active', mode === 'register');
     document.getElementById('pane-register').style.display = mode === 'register' ? 'block' : 'none';
-    document.getElementById('auth-submit').textContent = mode === 'login' ? 'Sign in' : 'Create account';
+    document.getElementById('pane-credentials').style.display = (mode === 'login' || mode === 'register') ? 'block' : 'none';
+    document.getElementById('pane-forgot').style.display = mode === 'forgot' ? 'block' : 'none';
+    document.getElementById('pane-reset').style.display = mode === 'reset' ? 'block' : 'none';
+    document.getElementById('back-link').style.display = (mode === 'forgot' || mode === 'reset') ? 'block' : 'none';
+    var labels = { login: 'Sign in', register: 'Create account', forgot: 'Send reset link', reset: 'Update password' };
+    document.getElementById('auth-submit').textContent = labels[mode];
     document.getElementById('auth-hint').textContent = '';
   }
 
   document.getElementById('auth-submit').addEventListener('click', function () {
+    var hint = document.getElementById('auth-hint');
+    if (!apiUp) { hint.className = 'hint err'; hint.textContent = 'This is unavailable right now — please try again shortly.'; return; }
+
+    if (authMode === 'forgot') {
+      var forgotEmail = document.getElementById('forgot-email').value.trim();
+      if (!forgotEmail) { hint.className = 'hint err'; hint.textContent = 'Enter your email address.'; return; }
+      sendJSON('POST', '/auth/forgot-password', { email: forgotEmail })
+        .then(function (data) {
+          if (data && data.resetToken) {
+            resetToken = data.resetToken;
+            setAuthMode('reset');
+          } else {
+            hint.className = 'hint ok'; hint.textContent = data.message || 'If that email exists, a reset link was sent.';
+          }
+        })
+        .catch(function (e) { hint.className = 'hint err'; hint.textContent = e.error || 'Could not start password reset.'; });
+      return;
+    }
+
+    if (authMode === 'reset') {
+      var newPass = document.getElementById('reset-new-pass').value;
+      if (!newPass) { hint.className = 'hint err'; hint.textContent = 'Enter a new password.'; return; }
+      if (newPass.length < 8) { hint.className = 'hint err'; hint.textContent = 'New password must be at least 8 characters.'; return; }
+      if (!resetToken) { hint.className = 'hint err'; hint.textContent = 'Reset link expired — request a new one.'; return; }
+      sendJSON('POST', '/auth/reset-password', { token: resetToken, newPassword: newPass })
+        .then(function () {
+          toast('Password updated — you can sign in now 🔐');
+          document.getElementById('reset-new-pass').value = '';
+          document.getElementById('auth-pass').value = '';
+          setAuthMode('login');
+        })
+        .catch(function (e) { hint.className = 'hint err'; hint.textContent = e.error || 'Could not reset password.'; });
+      return;
+    }
+
     var email = document.getElementById('auth-email').value.trim();
     var pass = document.getElementById('auth-pass').value;
-    var hint = document.getElementById('auth-hint');
     if (!email || !pass) { hint.className = 'hint err'; hint.textContent = 'Email and password are required.'; return; }
-    if (!apiUp) { hint.className = 'hint err'; hint.textContent = 'Sign-in is unavailable right now — please try again shortly.'; return; }
 
     if (authMode === 'register') {
       sendJSON('POST', '/auth/register', { email: email, password: pass, name: document.getElementById('reg-name').value.trim() })
@@ -903,6 +988,24 @@
       }).then(loadCart);
     });
   }
+
+  document.getElementById('pwd-submit').addEventListener('click', function () {
+    var current = document.getElementById('pwd-current').value;
+    var next = document.getElementById('pwd-new').value;
+    var hint = document.getElementById('pwd-hint');
+    if (!current || !next) { hint.className = 'hint err'; hint.textContent = 'Enter your current and new password.'; return; }
+    if (next.length < 8) { hint.className = 'hint err'; hint.textContent = 'New password must be at least 8 characters.'; return; }
+    if (!apiUp || !session) { hint.className = 'hint err'; hint.textContent = 'You must be signed in to change your password.'; return; }
+
+    sendAuthJSON('POST', '/auth/password', { currentPassword: current, newPassword: next })
+      .then(function () {
+        hint.className = 'hint ok'; hint.textContent = 'Password updated.';
+        document.getElementById('pwd-current').value = '';
+        document.getElementById('pwd-new').value = '';
+        toast('Password updated 🔐');
+      })
+      .catch(function (e) { hint.className = 'hint err'; hint.textContent = e.error || 'Could not update password.'; });
+  });
 
   document.getElementById('logout-btn').addEventListener('click', function () {
     session = null;
@@ -1154,7 +1257,7 @@
     var hint = document.getElementById('checkout-hint');
     if (!cart.length) { hint.className = 'hint err'; hint.textContent = 'Basket is empty.'; return; }
     if (!apiUp) { hint.className = 'hint err'; hint.textContent = 'Ordering is unavailable right now — please try again shortly.'; return; }
-    if (!session) { closePanels(); openPanel('auth-modal'); toast('Sign in to checkout'); return; }
+    if (!session) { closePanels(); setAuthMode('login'); openPanel('auth-modal'); toast('Sign in to checkout'); return; }
     var btn = this;
     btn.disabled = true;
     hint.className = 'hint';
