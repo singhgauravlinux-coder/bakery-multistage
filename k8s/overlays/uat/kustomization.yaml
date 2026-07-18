@@ -16,41 +16,45 @@ resources:
 commonLabels:
   environment: uat
 
+
+
+
+
 patches:
-  - path: patch-ingress-host.yaml
-    target:
-      kind: Ingress
-      name: bakery-ingress
+- path: patch-ingress-host.yaml
+  target:
+    kind: Ingress
+    name: bakery-ingress
+- path: patch-ingress-middleware.yaml
+  target:
+    kind: Ingress
+    name: bakery-ingress
+- path: patch-db-ingress-host.yaml
+  target:
+    kind: Ingress
+    name: bakery-db-ingress
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources
+      value:
+        requests:
+          cpu: 50m
+          memory: 98Mi
+        limits:
+          cpu: 200m
+          memory: 220Mi
 
-  - path: patch-ingress-middleware.yaml
-    target:
-      kind: Ingress
-      name: bakery-ingress
-
-  - path: patch-db-ingress-host.yaml
-    target:
-      kind: Ingress
-      name: bakery-db-ingress
-
-  - patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/resources
-        value:
-          requests:
-            cpu: 50m
-            memory: 98Mi
-          limits:
-            cpu: 200m
-            memory: 220Mi
-
-      - op: replace
-        path: /spec/replicas
-        value: 2
-    target:
-      kind: Deployment
-      labelSelector: app.kubernetes.io/part-of=crumb-and-ember
+    - op: replace
+      path: /spec/replicas
+      value: 2
+  target:
+    kind: Deployment
+    labelSelector: app.kubernetes.io/part-of=crumb-and-ember
 
 images:
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/auth-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/auth-service
+  newTag: 1d662d5
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/baking-schedule-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/baking-schedule-service
   newTag: fc7b23f
