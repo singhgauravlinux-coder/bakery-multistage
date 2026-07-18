@@ -39,6 +39,9 @@ patches:
     labelSelector: app.kubernetes.io/part-of=crumb-and-ember
 
 images:
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/baking-schedule-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/baking-schedule-service
+  newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/cart-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/cart-service
   newTag: fc7b23f
