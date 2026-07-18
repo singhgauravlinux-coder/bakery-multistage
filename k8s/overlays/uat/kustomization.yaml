@@ -76,7 +76,7 @@ images:
   newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/cart-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/cart-service
-  newTag: fc7b23f
+  newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/delivery-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/delivery-service
   newTag: c31af6b
