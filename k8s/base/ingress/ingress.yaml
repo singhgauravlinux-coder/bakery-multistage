@@ -24,7 +24,7 @@ metadata:
   namespace: bakery
   annotations:
     # <namespace>-<middleware>@kubernetescrd
-    traefik.ingress.kubernetes.io/router.middlewares: bakery-body-limit@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: bakery-dev-limit@kubernetescrd
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   ingressClassName: traefik
