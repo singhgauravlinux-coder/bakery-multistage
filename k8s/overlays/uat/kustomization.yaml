@@ -99,7 +99,7 @@ images:
   newTag: fddf672
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/notification-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/notification-service
-  newTag: fc7b23f
+  newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/order-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/order-service
   newTag: fc7b23f
