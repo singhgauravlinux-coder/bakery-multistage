@@ -1,0 +1,50 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# ---------------------------------------------------------------------------
+# DEV overlay
+#   - one namespace per env, everything else inherited from ../../base
+#   - 1 replica per service (cheap, fast feedback)
+#   - images are pinned per-service by the service's own CI pipeline via
+#     `kustomize edit set image` (see .github/workflows/_service-pipeline.yml)
+# ---------------------------------------------------------------------------
+
+namespace: bakery-dev
+
+resources:
+- ../../base
+- ../../base/ingress
+
+commonLabels:
+  environment: dev
+
+  # Every service Deployment has exactly one container, so a positional
+  # JSON6902 patch (index 0) works regardless of container name and applies
+  # identically to all 25 services in one shot.
+patches:
+- path: patch-ingress-host.yaml
+  target:
+    kind: Ingress
+    name: bakery-ingress
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources
+      value:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 150m
+          memory: 192Mi
+    - op: replace
+      path: /spec/replicas
+      value: 1
+  target:
+    kind: Deployment
+    labelSelector: app.kubernetes.io/part-of=crumb-and-ember
+
+# Image tags are rewritten in-place by each service's pipeline, e.g.:
+#   images:
+#     - name: ghcr.io/OWNER/bakery-language/auth-service
+#       newTag: <short-sha>
+images: []

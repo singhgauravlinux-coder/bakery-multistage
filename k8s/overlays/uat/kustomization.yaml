@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# ---------------------------------------------------------------------------
+# UAT overlay - mirrors production shape (2 replicas) but on smaller
+# resource requests, so sign-off testing runs on real rolling-update
+# behaviour without paying full prod cost.
+# ---------------------------------------------------------------------------
+
+namespace: bakery-uat
+
+resources:
+  - ../../base
+  - ../../base/ingress
+
+commonLabels:
+  environment: uat
+
+patches:
+  - path: patch-ingress-host.yaml
+    target:
+      kind: Ingress
+      name: bakery-ingress
+  - target:
+      kind: Deployment
+      labelSelector: "app.kubernetes.io/part-of=crumb-and-ember"
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 50m
+            memory: 96Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+images: []
