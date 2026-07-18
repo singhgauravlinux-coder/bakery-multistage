@@ -12,16 +12,16 @@ namespace: bakery-prod
 
 resources:
 - ../../base
-- ../../base/ingress
+#- ../../base/ingress
 
 commonLabels:
   environment: production
 
 patches:
-- path: patch-ingress-host.yaml
-  target:
-    kind: Ingress
-    name: bakery-ingress
+#- path: patch-ingress-host.yaml
+#  target:
+#    kind: Ingress
+#    name: bakery-ingress
 - patch: |-
     - op: replace
       path: /spec/template/spec/containers/0/resources
