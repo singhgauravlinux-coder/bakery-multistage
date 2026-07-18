@@ -51,7 +51,7 @@ images:
   newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/baking-schedule-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/baking-schedule-service
-  newTag: fc7b23f
+  newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/cart-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/cart-service
   newTag: c31af6b
