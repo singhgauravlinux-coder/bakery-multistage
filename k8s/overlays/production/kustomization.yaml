@@ -43,3 +43,6 @@ images:
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/order-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/order-service
   newTag: c77858f
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/search-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/search-service
+  newTag: c77858f
