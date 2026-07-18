@@ -131,7 +131,7 @@ images:
   newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/product-catalog-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/product-catalog-service
-  newTag: fc7b23f
+  newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/promotion-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/promotion-service
   newTag: c31af6b
