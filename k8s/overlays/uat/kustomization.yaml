@@ -21,6 +21,7 @@ commonLabels:
 
 
 
+
 patches:
 - path: patch-ingress-host.yaml
   target:
@@ -70,7 +71,7 @@ images:
   newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/frontend
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/frontend
-  newTag: fc7b23f
+  newTag: c1a1415
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/invoice-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/invoice-service
   newTag: fc7b23f
