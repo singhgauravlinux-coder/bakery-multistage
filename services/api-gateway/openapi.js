@@ -53,6 +53,28 @@ module.exports = {
         responses: { 200: ok('Token valid'), 401: err('Invalid or expired token') }
       }
     },
+    '/auth/forgot-password': {
+      post: {
+        tags: ['auth'], summary: 'Request a password reset token for an account',
+        requestBody: jsonBody({ email: str('jo@example.com') }, ['email']),
+        responses: { 200: ok('Reset token issued if the email is registered (response shape does not reveal existence)') }
+      }
+    },
+    '/auth/reset-password': {
+      post: {
+        tags: ['auth'], summary: 'Redeem a reset token to set a new password',
+        requestBody: jsonBody({ token: str('<reset token>'), newPassword: str('n3wS3cret!') }, ['token', 'newPassword']),
+        responses: { 200: ok('Password reset'), 400: err('Missing fields or password too short'), 401: err('Reset token invalid or expired') }
+      }
+    },
+    '/auth/password': {
+      post: {
+        tags: ['auth'], summary: 'Update the logged-in account\'s password',
+        parameters: [hdr('authorization', 'Bearer <token>')],
+        requestBody: jsonBody({ currentPassword: str('s3cret!'), newPassword: str('n3wS3cret!') }, ['currentPassword', 'newPassword']),
+        responses: { 200: ok('Password updated'), 400: err('Missing fields or password too short'), 401: err('Invalid token or current password incorrect') }
+      }
+    },
     // -------------------------------------------------------------- users
     '/users': { get: { tags: ['users'], summary: 'List users', responses: { 200: ok('User list') } } },
     '/users/{id}': {
