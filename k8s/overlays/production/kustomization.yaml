@@ -102,7 +102,7 @@ images:
   newTag: e95986e
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/review-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/review-service
-  newTag: fc7b23f
+  newTag: c31af6b
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/search-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/search-service
   newTag: e95986e
