@@ -10,32 +10,35 @@ kind: Kustomization
 namespace: bakery-uat
 
 resources:
-  - ../../base
-  - ../../base/ingress
+- ../../base
+- ../../base/ingress
 
 commonLabels:
   environment: uat
 
 patches:
-  - path: patch-ingress-host.yaml
-    target:
-      kind: Ingress
-      name: bakery-ingress
-  - target:
-      kind: Deployment
-      labelSelector: "app.kubernetes.io/part-of=crumb-and-ember"
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/resources
-        value:
-          requests:
-            cpu: 50m
-            memory: 96Mi
-          limits:
-            cpu: 250m
-            memory: 256Mi
-      - op: replace
-        path: /spec/replicas
-        value: 2
+- path: patch-ingress-host.yaml
+  target:
+    kind: Ingress
+    name: bakery-ingress
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources
+      value:
+        requests:
+          cpu: 50m
+          memory: 96Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
+    - op: replace
+      path: /spec/replicas
+      value: 2
+  target:
+    kind: Deployment
+    labelSelector: app.kubernetes.io/part-of=crumb-and-ember
 
-images: []
+images:
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/pricing-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/pricing-service
+  newTag: c77858f
