@@ -98,6 +98,9 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: dev
+    concurrency:
+      group: bump-image-dev
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
@@ -118,6 +121,9 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: uat
+    concurrency:
+      group: bump-image-uat
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
@@ -138,6 +144,9 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
+    concurrency:
+      group: bump-image-production
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
