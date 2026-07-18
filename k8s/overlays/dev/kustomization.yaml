@@ -51,3 +51,6 @@ images:
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/inventory-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/inventory-service
   newTag: c77858f
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/review-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/review-service
+  newTag: c77858f
