@@ -59,6 +59,9 @@ patches:
     labelSelector: app.kubernetes.io/part-of=crumb-and-ember
 
 images:
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/analytics-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/analytics-service
+  newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/api-gateway
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/api-gateway
   newTag: 9905abf
@@ -77,6 +80,9 @@ images:
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/frontend
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/frontend
   newTag: c1a1415
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/inventory-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/inventory-service
+  newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/invoice-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/invoice-service
   newTag: fc7b23f
@@ -89,6 +95,9 @@ images:
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/media-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/media-service
   newTag: fddf672
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/notification-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/notification-service
+  newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/order-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/order-service
   newTag: fc7b23f
@@ -101,12 +110,18 @@ images:
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/product-catalog-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/product-catalog-service
   newTag: fc7b23f
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/promotion-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/promotion-service
+  newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/recipe-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/recipe-service
   newTag: e95986e
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/recommendation-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/recommendation-service
   newTag: e95986e
+- name: ghcr.io/singhgauravlinux-coder/bakery-multistage/review-service
+  newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/review-service
+  newTag: fc7b23f
 - name: ghcr.io/singhgauravlinux-coder/bakery-multistage/search-service
   newName: ghcr.io/singhgauravlinux-coder/bakery-multistage/search-service
   newTag: e95986e
