@@ -15,9 +15,9 @@ Four full color themes ship in [`docs/assets/`](docs/assets/) — every diagram 
 | | | |
 |---|---|---|
 | 🔥 **ember** *(default)* | <img src="docs/assets/ember/hero.svg" width="380"/> | butter & espresso |
-| 🌌 **midnight** | <img src="docs/assets/midnight/hero.svg" width="380"/> | tokyo-night blues |
-| 🍵 **matcha** | <img src="docs/assets/matcha/hero.svg" width="380"/> | green tea & cream |
-| 🫐 **berry** | <img src="docs/assets/berry/hero.svg" width="380"/> | plum & rosé |
+#| 🌌 **midnight** | <img src="docs/assets/midnight/hero.svg" width="380"/> | tokyo-night blues |
+#| 🍵 **matcha** | <img src="docs/assets/matcha/hero.svg" width="380"/> | green tea & cream |
+#| 🫐 **berry** | <img src="docs/assets/berry/hero.svg" width="380"/> | plum & rosé |
 
 Switch the whole README in one command:
 
